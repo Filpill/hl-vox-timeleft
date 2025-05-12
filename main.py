@@ -73,13 +73,13 @@ def update_timer(total_seconds):
 
     while total_seconds >= 0 and countdown_running and dpg.is_dearpygui_running():
 
-        if reset_requested:
-            reset_requested = False
-            break
+        #if reset_requested:
+        #    reset_requested = False
+        #    break
 
-        if pause_requested:
-            time.sleep(0.1)
-            continue
+        #if pause_requested:
+        #    time.sleep(0.1)
+        #    continue
 
 
         h = total_seconds // 3600
