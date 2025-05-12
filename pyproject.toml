@@ -1,0 +1,11 @@
+[project]
+name = "hl-vox-timeleft"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "num2words>=0.5.14",
+    "pydub>=0.25.1",
+    "simpleaudio>=1.0.4",
+]
