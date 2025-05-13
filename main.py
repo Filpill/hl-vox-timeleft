@@ -4,18 +4,15 @@ import random
 import threading
 import subprocess
 import dearpygui.dearpygui as dpg
-import numpy as np
 from num2words import num2words
 from pathlib import Path
-from PIL import Image
 
-def build_path(file, path_suffix):
+def build_path(path_suffix, file):
     root_path = Path(__file__).parent
     path_dir = f"{root_path}/assets/{path_suffix}"
     return f"{path_dir}/{file}"
 
-def play_sound(sound_file, path_suffix):
-    sound_path = build_path(sound_file, path_suffix)
+def play_sound(sound_path):
     subprocess.run(["bash", "-c", f"ffplay -nodisp -autoexit {sound_path}"], capture_output=True)
 
 def append_file_extension(filename, extension):
@@ -58,18 +55,24 @@ def play_timeleft(timeleft, dir):
     time_wavs += ["remaining.wav"]
 
     for sound_file in time_wavs:
-        play_sound(sound_file, dir)
+        play_sound(build_path(dir, sound_file))
 
 def play_countdown(dir):
     countdown_list = [
-        "eleven","ten","nine","eight","seven","six",
+        #"eleven","ten","nine","eight","seven","six",
         "five","four","three","two","one",
     ]
 
+    # Play Countdown
     countdown_wavs  = [append_file_extension(word, "wav") for word in countdown_list]
     for sound_file in countdown_wavs:
-        play_sound(sound_file, dir)
-        play_sound("_period.wav", dir)
+        play_sound(build_path(dir, "_period.wav"))
+        play_sound(build_path(dir, sound_file))
+
+    # Ending Sound
+    sound_type = "gman"
+    end_sound, end_sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
+    play_sound(end_sound_path)
 
 #--------------------------------------------------------------------------------#
 
@@ -96,7 +99,8 @@ def update_timer(total_seconds):
         dpg.set_value(TIMER_TAG, formatted)
 
         # Trigger countdown audio at 10s remaining
-        if total_seconds == 11 and not countdown_sound_played:
+        if total_seconds == 5 and not countdown_sound_played:
+        #if total_seconds == 11 and not countdown_sound_played:
             played_countdown = True
             threading.Thread(target=play_countdown, args=("sounds/vox",), daemon=True).start()
 
@@ -105,6 +109,10 @@ def update_timer(total_seconds):
     countdown_running = False #reset flag
 
 def click_start(sender, app_data, user_data):
+
+    # Play sound after activating callback
+    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+
     if countdown_running:
         return  # Prevent multiple timers
 
@@ -122,22 +130,38 @@ def click_start(sender, app_data, user_data):
     threading.Thread(target=update_timer, args=(total_seconds,), daemon=True).start()
 
 def click_pause(sender, app_data, user_data):
+    #
+    # Play sound after activating callback
+    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+
     global pause_requested
     pause_requested = not pause_requested  # Toggle pause
     dpg.set_item_label("pause_button", "Resume" if pause_requested else "Pause")
 
 def click_reset(sender, app_data, user_data):
+
+    # Play sound after activating callback
+    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+
     global reset_requested
     reset_requested = True
     dpg.set_value(TIMER_TAG, "00:00:00")
 
 def click_timeleft(sender, app_data, user_data):
+
+    # Play sound after activating callback
+    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+
     remaining_time = dpg.get_value(TIMER_TAG)
-    play_timeleft(remaining_time, "sounds/vox")
+    threading.Thread(target=play_timeleft, args=(remaining_time, "sounds/vox",), daemon=True).start()
 
 def click_change_bg(sender, app_data, user_data):
+
+    # Play sound after activating callback
+    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
     
-    bg_texture_name, bg_texture_path = get_random_file(build_path("", "img/bg"))  
+    # Get new BG image
+    bg_texture_name, bg_texture_path = get_random_file(build_path("img/bg",""))  
     if not os.path.isfile(bg_texture_path):                                       
         print(f"Image not found: {bg_texture_path}")                              
         return                                                                    
@@ -184,8 +208,9 @@ if __name__ == "__main__":
     TIMELEFT_TAG    = "timeleft_button"
     BACKGROUND_TAG  = "background_button"
 
-    bg_texture_name, bg_texture_path = get_random_file(build_path("","img/bg"))
-    font_trebuc = build_path("trebuc.ttf", "fonts")
+    bg_texture_name, bg_texture_path = get_random_file(build_path("img/bg",""))
+    button_click_path = build_path("sounds/UI/","buttonclick.wav")
+    font_trebuc_path  = build_path("fonts","trebuc.ttf")
 
     dpg.create_context()
 
@@ -194,7 +219,7 @@ if __name__ == "__main__":
 
     # Adding assets to registry
     with dpg.font_registry():                                                              
-        large_font = dpg.add_font(font_trebuc, 48)  
+        large_font = dpg.add_font(font_trebuc_path, 48)  
 
     with dpg.texture_registry():                                                              
         bg = dpg.add_dynamic_texture(width, height, data, tag=IMAGE_TAG)
@@ -228,7 +253,7 @@ if __name__ == "__main__":
         dpg.add_spacer(height=10)
 
         # Time input field
-        dpg.add_input_text(label="HH:MM:SS", hint="HH:MM:SS", default_value="00:30:00", tag=INPUT_TAG)
+        dpg.add_input_text(label="HH:MM:SS", hint="HH:MM:SS", default_value="00:00:05", tag=INPUT_TAG)
 
         # Start/Pause/Reset Buttons
         with dpg.group(horizontal=True):
