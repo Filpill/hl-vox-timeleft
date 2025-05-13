@@ -1,8 +1,8 @@
 # Half-Life Pomodoro Timer
 
-Python application to manage your time -- now with Half-Life sky textures and sounds!
+Python `dearpygui` application to manage your time -- now with Half-Life sky textures and sounds!
 
-GUI designed using the `dearpygui` library.
+> https://youtube.com/shorts/OZr_s5ugzXM
 
 <p align = center>                                                                                                                         
 <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/gif/hl-timer1.gif" alt="drawing" width="200"/> 
