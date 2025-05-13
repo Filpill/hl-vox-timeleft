@@ -5,7 +5,7 @@ Python application to manage your time -- now with Half-Life sky textures and so
 GUI designed using the `dearpygui` library.
 
 <p align = center>                                                                                                                         
-<img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/gif/hl-timer1.gif" alt="drawing" width="1000"/> 
+<img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/gif/hl-timer1.gif" alt="drawing" width="200"/> 
 </p>                                                                                                                                       
 
 #### File Directory
@@ -25,14 +25,10 @@ Types of files stored in this project
 
 #### System Requirements
 Sub-shell responsible for playing sounds effects and requires `ffmpeg` to be installed on users machine in run Python application:
+
+***e.g. Arch install:***
 ```bash
 sudo pacman -S ffmpeg
-```
-
-or 
-
-```bash
-sudo apt-get install ffmpeg
 ```
 
 #### Python Virtual Environment
