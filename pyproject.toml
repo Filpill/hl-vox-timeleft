@@ -1,12 +1,10 @@
 [project]
 name = "hl-vox-timeleft"
 version = "0.1.0"
-description = "Add your description here"
+description = "Half-Life Pomodoro Timer"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "dearpygui>=2.0.0",
     "num2words>=0.5.14",
-    "numpy>=2.2.5",
-    "pillow>=11.2.1",
-    "tk>=0.1.0",
 ]
