@@ -99,8 +99,7 @@ def update_timer(total_seconds):
         dpg.set_value(TIMER_TAG, formatted)
 
         # Trigger countdown audio at 10s remaining
-        if total_seconds == 5 and not countdown_sound_played:
-        #if total_seconds == 11 and not countdown_sound_played:
+        if total_seconds == countdown_threshold and not countdown_sound_played:
             played_countdown = True
             threading.Thread(target=play_countdown, args=("sounds/vox",), daemon=True).start()
 
@@ -185,7 +184,8 @@ def apply_font(tag):
 
 if __name__ == "__main__":
 
-    countdown_running = False # Init default value
+    countdown_running = False  # Init default value
+    countdown_threshold = 5    # Measured in seconds
 
     screen_width      = 1920
     screen_height     = 1080
