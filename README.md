@@ -4,11 +4,12 @@ Python `dearpygui` application to manage your time -- now with Half-Life sky tex
 
 > https://youtube.com/shorts/OZr_s5ugzXM
 
-<p align = center>                                                                                                                         
-<img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/gif/hl-timer1.gif" alt="drawing" width="200"/> 
-</p>                                                                                                                                       
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/gif/hl-timer1.gif" alt="HL Timer" height="300"/>
+  <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/img/model/gordon.bmp" alt="Gordon Model" height="300"/>
+</p>                                                                                                                        
 
-#### File Directory
+### File Directory
 Types of files stored in this project
 <div align = center>
   
@@ -23,7 +24,7 @@ Types of files stored in this project
   
 </div>
 
-#### System Requirements
+### System Requirements
 Sub-shell responsible for playing sounds effects and requires `ffmpeg` to be installed on users machine in run Python application:
 
 ***e.g. Arch install:***
@@ -31,7 +32,7 @@ Sub-shell responsible for playing sounds effects and requires `ffmpeg` to be ins
 sudo pacman -S ffmpeg
 ```
 
-#### Python Virtual Environment
+### Python Virtual Environment
 
 Python environment is created using the **uv** package manager and the following files specify dependancies:
 
