@@ -83,13 +83,13 @@ def update_timer(total_seconds):
 
     while total_seconds >= 0 and countdown_running and dpg.is_dearpygui_running():
 
-        #if reset_requested:
-        #    reset_requested = False
-        #    break
+        if reset_requested:
+            reset_requested = False
+            break
 
-        #if pause_requested:
-        #    time.sleep(0.1)
-        #    continue
+        if pause_requested:
+            time.sleep(0.1)
+            continue
 
 
         h = total_seconds // 3600
@@ -107,16 +107,22 @@ def update_timer(total_seconds):
         total_seconds -= 1
     countdown_running = False #reset flag
 
+
 def click_start(sender, app_data, user_data):
+
+    global pause_requested
 
     # Play sound after activating callback
     threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
 
-    if countdown_running:
-        return  # Prevent multiple timers
+    # Auto-resume if paused
+    pause_requested = False
+    dpg.set_item_label(PAUSE_TAG, "Pause")  # Reset label
 
+    # Get Input value from the user-text box
     input_value = dpg.get_value(INPUT_TAG)
 
+    # Convert text input value and map to time units to calculate total seconds remaining
     try:
         h, m, s = map(int, input_value.strip().split(":"))
         total_seconds = h * 3600 + m * 60 + s
@@ -126,10 +132,10 @@ def click_start(sender, app_data, user_data):
         dpg.set_value(TIMER_TAG, "Invalid time")
         return
 
+    # Update the Timer on a new thread
     threading.Thread(target=update_timer, args=(total_seconds,), daemon=True).start()
 
 def click_pause(sender, app_data, user_data):
-    #
     # Play sound after activating callback
     threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
 
@@ -184,8 +190,11 @@ def apply_font(tag):
 
 if __name__ == "__main__":
 
-    countdown_running = False  # Init default value
-    countdown_threshold = 5    # Measured in seconds
+    reset_requested     = False
+    pause_requested     = False
+    countdown_running   = False
+    countdown_threshold = 5 # Measured in seconds
+    pomodorro_time      = "00:30:00" # HH:MM:SS
 
     screen_width      = 1920
     screen_height     = 1080
@@ -195,6 +204,7 @@ if __name__ == "__main__":
     image_height      = 180
     padding_input     = 75
     padding_xwin_pos  = 10
+    padding_ywin_pos  = 10
     padding_timeleft  = 15
 
     TEXT_TAG        = "text_tag"
@@ -253,7 +263,7 @@ if __name__ == "__main__":
         dpg.add_spacer(height=10)
 
         # Time input field
-        dpg.add_input_text(label="HH:MM:SS", hint="HH:MM:SS", default_value="00:00:05", tag=INPUT_TAG)
+        dpg.add_input_text(label="HH:MM:SS", hint="HH:MM:SS", default_value=pomodorro_time, tag=INPUT_TAG)
 
         # Start/Pause/Reset Buttons
         with dpg.group(horizontal=True):
@@ -268,7 +278,7 @@ if __name__ == "__main__":
     
     # Positioning window upon opening application
     x_pos = screen_width - viewport_width - padding_xwin_pos  
-    y_pos = screen_height - viewport_height
+    y_pos = screen_height - viewport_height - padding_ywin_pos
 
     # Creating Viewport
     dpg.create_viewport(title="Timeleft View Port", width=viewport_width, height=viewport_height)
@@ -287,7 +297,7 @@ if __name__ == "__main__":
     dpg.configure_item(BACKGROUND_TAG, width = viewport_width-padding_timeleft)
     dpg.configure_item(TIMELEFT_TAG, width = viewport_width-padding_timeleft)
     dpg.configure_item(INPUT_TAG, width = viewport_width-padding_input)
-    dpg.show_viewport()
     dpg.set_primary_window("Timer Window", True)
+    dpg.show_viewport()
     dpg.start_dearpygui()
     dpg.destroy_context()
