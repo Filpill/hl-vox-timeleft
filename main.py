@@ -4,8 +4,10 @@ import random
 import threading
 import subprocess
 import dearpygui.dearpygui as dpg
+import numpy as np
 from num2words import num2words
 from pathlib import Path
+from PIL import Image
 
 def build_path(file, path_suffix):
     root_path = Path(__file__).parent
@@ -21,12 +23,6 @@ def append_file_extension(filename, extension):
 
 def split_words(hypthenated_word):
     return num2words(hypthenated_word).replace("-", " ").split()
-
-def load_texture(path):
-    image = Image.open(path).convert("RGBA")
-    width, height = image.size
-    data = np.frombuffer(image.tobytes(), dtype=np.uint8) / 255.0
-    return dpg.add_static_texture(width, height, data)
 
 def get_random_file(path):
         files = [f for f in os.listdir(path)]
@@ -140,7 +136,23 @@ def click_timeleft(sender, app_data, user_data):
     play_timeleft(remaining_time, "sounds/vox")
 
 def click_change_bg(sender, app_data, user_data):
-    load_new_background("assets/img/bg/2desertbk_alt.bmp")  # or any other image path
+    
+    bg_texture_name, bg_texture_path = get_random_file(build_path("", "img/bg"))  
+    if not os.path.isfile(bg_texture_path):                                       
+        print(f"Image not found: {bg_texture_path}")                              
+        return                                                                    
+
+    # Update existing texture                                 
+    width, height, channels, data = dpg.load_image(bg_texture_path)
+    dpg.set_value(IMAGE_TAG, data)                            
+    dpg.configure_item(IMAGE_TAG, width=image_width, height=image_height) 
+
+    # Clear old drawlist
+    dpg.delete_item(DRAWLIST_TAG, children_only=True)
+
+    # Redraw drawlist elemnents
+    dpg.draw_image(IMAGE_TAG, pmin=(0, 0), pmax=(image_width, image_height), parent=DRAWLIST_TAG)
+    dpg.draw_text(text=bg_texture_name,pos=(2, image_height - 15), size=14, color=(255, 255, 255, 255),parent=DRAWLIST_TAG)
 
 def apply_font(tag):
     dpg.bind_item_font(tag, large_font)
@@ -161,12 +173,14 @@ if __name__ == "__main__":
     padding_xwin_pos  = 10
     padding_timeleft  = 15
 
+    TEXT_TAG        = "text_tag"
     TIMER_TAG       = "timer_text"
     INPUT_TAG       = "input_field"
     START_TAG       = "start_button"
     PAUSE_TAG       = "pause_button"
     RESET_TAG       = "reset_button"
     IMAGE_TAG       = "image_texture"
+    DRAWLIST_TAG    = "drawlist_tag"
     TIMELEFT_TAG    = "timeleft_button"
     BACKGROUND_TAG  = "background_button"
 
@@ -183,9 +197,9 @@ if __name__ == "__main__":
         large_font = dpg.add_font(font_trebuc, 48)  
 
     with dpg.texture_registry():                                                              
-        bg = dpg.add_static_texture(width, height, data, tag=IMAGE_TAG)
+        bg = dpg.add_dynamic_texture(width, height, data, tag=IMAGE_TAG)
 
-    with dpg.viewport_drawlist(front=True):
+    with dpg.viewport_drawlist(front=True, tag=DRAWLIST_TAG):
         dpg.draw_image(
             IMAGE_TAG,
             pmin=(0, 0),  # X, Y starting point
@@ -204,7 +218,7 @@ if __name__ == "__main__":
         dpg.add_spacer(height=image_height)
 
         # Change BG button
-        dpg.add_button(label="Change Background", tag=BACKGROUND_TAG)
+        dpg.add_button(label="Change Background", tag=BACKGROUND_TAG, callback=click_change_bg)
 
         # Countdown Timer
         with dpg.group(horizontal=True):
