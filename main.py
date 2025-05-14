@@ -113,7 +113,7 @@ def click_start(sender, app_data, user_data):
     global pause_requested
 
     # Play sound after activating callback
-    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+    threading.Thread(target=play_sound, args=(start_sound,), daemon=True).start()
 
     # Auto-resume if paused
     pause_requested = False
@@ -137,7 +137,7 @@ def click_start(sender, app_data, user_data):
 
 def click_pause(sender, app_data, user_data):
     # Play sound after activating callback
-    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+    threading.Thread(target=play_sound, args=(pause_sound,), daemon=True).start()
 
     global pause_requested
     pause_requested = not pause_requested  # Toggle pause
@@ -146,7 +146,7 @@ def click_pause(sender, app_data, user_data):
 def click_reset(sender, app_data, user_data):
 
     # Play sound after activating callback
-    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+    threading.Thread(target=play_sound, args=(reset_sound,), daemon=True).start()
 
     global reset_requested
     reset_requested = True
@@ -155,7 +155,7 @@ def click_reset(sender, app_data, user_data):
 def click_timeleft(sender, app_data, user_data):
 
     # Play sound after activating callback
-    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+    threading.Thread(target=play_sound, args=(timeleft_sound,), daemon=True).start()
 
     remaining_time = dpg.get_value(TIMER_TAG)
     threading.Thread(target=play_timeleft, args=(remaining_time, "sounds/vox",), daemon=True).start()
@@ -163,7 +163,7 @@ def click_timeleft(sender, app_data, user_data):
 def click_change_bg(sender, app_data, user_data):
 
     # Play sound after activating callback
-    threading.Thread(target=play_sound, args=(button_click_path,), daemon=True).start()
+    threading.Thread(target=play_sound, args=(bg_sound,), daemon=True).start()
     
     # Get new BG image
     bg_texture_name, bg_texture_path = get_random_file(build_path("img/bg",""))  
@@ -190,6 +190,7 @@ def apply_font(tag):
 
 if __name__ == "__main__":
 
+    # Variables
     reset_requested     = False
     pause_requested     = False
     countdown_running   = False
@@ -219,9 +220,18 @@ if __name__ == "__main__":
     BACKGROUND_TAG  = "background_button"
 
     bg_texture_name, bg_texture_path = get_random_file(build_path("img/bg",""))
-    button_click_path = build_path("sounds/UI/","buttonclick.wav")
-    font_trebuc_path  = build_path("fonts","trebuc.ttf")
+    bg_sound       = build_path("sounds/UI/","buttonclick.wav")
+    start_sound    = build_path("sounds/buttons/","button3.wav")
+    pause_sound    = build_path("sounds/common/","wpn_select.wav")
+    reset_sound    = build_path("sounds/buttons/","button1.wav")
+    timeleft_sound = build_path("sounds/UI/","buttonclick.wav")
+    open_app_sound = build_path("sounds/items/","gunpickup2.wav")
+    font_trebuc    = build_path("fonts","trebuc.ttf")
 
+    # Sound to play on opening application                                              
+    threading.Thread(target=play_sound, args=(open_app_sound,), daemon=True).start() 
+
+    # Create GUI Context here
     dpg.create_context()
 
     # Loading Texture Asset
@@ -229,7 +239,7 @@ if __name__ == "__main__":
 
     # Adding assets to registry
     with dpg.font_registry():                                                              
-        large_font = dpg.add_font(font_trebuc_path, 48)  
+        large_font = dpg.add_font(font_trebuc, 48)  
 
     with dpg.texture_registry():                                                              
         bg = dpg.add_dynamic_texture(width, height, data, tag=IMAGE_TAG)
