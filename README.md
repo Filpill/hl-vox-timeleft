@@ -1,4 +1,4 @@
-# Counter-Strike/Half-Life Pomodoro Timer
+# Counter-Strike Pomodoro Timer
 
 Python `dearpygui` application to manage your time -- now with Half-Life sky textures and sounds!
 
