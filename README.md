@@ -5,7 +5,7 @@ Python `dearpygui` application to manage your time -- now with Half-Life sky tex
 > https://youtube.com/shorts/OZr_s5ugzXM
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/img/model/gordon.png" alt="Gordon Model" height="300"/>
+  <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/img/model/t-squad.png" alt="T Squad" height="250"/>
   <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/gif/hl-timer1.gif" alt="HL Timer" height="300"/>
   <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/img/model/ct-squad.png" alt="CT Squad" height="250"/>
 </p>                                                                                                                        
