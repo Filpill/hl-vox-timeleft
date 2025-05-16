@@ -24,7 +24,7 @@ def split_words(hypthenated_word):
 def get_random_file(path):
         files = [f for f in os.listdir(path)]
         random_file = random.choice(files) 
-        return random_file, f"{path}/{random_file}"
+        return f"{path}{random_file}"
 
 def time_to_words(time_str):
     hours, minutes, seconds = map(int, time_str.split(":"))
@@ -71,14 +71,13 @@ def play_countdown(dir):
 
     # Ending Sound
     sound_type = "gman"
-    end_sound, end_sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
+    end_sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
     play_sound(end_sound_path)
 
 def play_shootgun(dir):
     sound_type = "cs_weapons/shoot"
-    sound, sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
-    play_sound(sound_path)
-    print(sound_path)
+    gun_sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
+    play_sound(gun_sound_path)
 
 #--------------------------------------------------------------------------------#
 
@@ -176,7 +175,8 @@ def click_change_bg(sender, app_data, user_data):
     threading.Thread(target=play_sound, args=(bg_sound,), daemon=True).start()
     
     # Get new BG image
-    bg_texture_name, bg_texture_path = get_random_file(build_path("img/bg",""))  
+    bg_texture_path = get_random_file(build_path("img/bg",""))  
+    bg_texture_name = bg_texture_path.rsplit('/', 1)[-1]
     if not os.path.isfile(bg_texture_path):                                       
         print(f"Image not found: {bg_texture_path}")                              
         return                                                                    
@@ -230,14 +230,14 @@ if __name__ == "__main__":
     TIMELEFT_TAG    = "timeleft_button"
     BACKGROUND_TAG  = "background_button"
 
-    bg_texture_name, bg_texture_path = get_random_file(build_path("img/bg",""))
-    bg_sound       = build_path("sounds/UI/","buttonclick.wav")
-    start_sound    = build_path("sounds/buttons/","button3.wav")
-    pause_sound    = build_path("sounds/common/","wpn_select.wav")
-    reset_sound    = build_path("sounds/buttons/","button1.wav")
-    timeleft_sound = build_path("sounds/UI/","buttonclick.wav")
-    open_app_sound = build_path("sounds/items/","gunpickup2.wav")
-    font_trebuc    = build_path("fonts","trebuc.ttf")
+    bg_texture_path = get_random_file(build_path("img/bg",""))
+    bg_sound        = build_path("sounds/UI/","buttonclick.wav")
+    start_sound     = build_path("sounds/buttons/","button3.wav")
+    pause_sound     = build_path("sounds/common/","wpn_select.wav")
+    reset_sound     = build_path("sounds/buttons/","button1.wav")
+    timeleft_sound  = build_path("sounds/UI/","buttonclick.wav")
+    open_app_sound  = build_path("sounds/items/","gunpickup2.wav")
+    font_trebuc     = build_path("fonts","trebuc.ttf")
 
     # Sound to play on opening application                                              
     threading.Thread(target=play_sound, args=(open_app_sound,), daemon=True).start() 
@@ -263,7 +263,7 @@ if __name__ == "__main__":
         )
 
         dpg.draw_text(
-            text=f"{bg_texture_name}",
+            text=f"{bg_texture_path.rsplit('/', 1)[-1] }",
             pos=(2, image_height-15),  # X, Y position inside the image
             size=14,  # Font size
             color=(255, 255, 255, 255)  # White text
