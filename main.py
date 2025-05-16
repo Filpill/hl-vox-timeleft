@@ -74,6 +74,12 @@ def play_countdown(dir):
     end_sound, end_sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
     play_sound(end_sound_path)
 
+def play_shootgun(dir):
+    sound_type = "cs_weapons/shoot"
+    sound, sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
+    play_sound(sound_path)
+    print(sound_path)
+
 #--------------------------------------------------------------------------------#
 
 def update_timer(total_seconds):
@@ -160,6 +166,10 @@ def click_timeleft(sender, app_data, user_data):
     remaining_time = dpg.get_value(TIMER_TAG)
     threading.Thread(target=play_timeleft, args=(remaining_time, "sounds/vox",), daemon=True).start()
 
+def click_shootgun(sender, app_data, user_data):                                                      
+                                                                                                      
+    threading.Thread(target=play_shootgun, args=("cs_weapons/shoot",), daemon=True).start() 
+
 def click_change_bg(sender, app_data, user_data):
 
     # Play sound after activating callback
@@ -215,6 +225,7 @@ if __name__ == "__main__":
     PAUSE_TAG       = "pause_button"
     RESET_TAG       = "reset_button"
     IMAGE_TAG       = "image_texture"
+    SHOOT_TAG       = "shoot_gun_button"
     DRAWLIST_TAG    = "drawlist_tag"
     TIMELEFT_TAG    = "timeleft_button"
     BACKGROUND_TAG  = "background_button"
@@ -264,6 +275,9 @@ if __name__ == "__main__":
 
         # Change BG button
         dpg.add_button(label="Change Background", tag=BACKGROUND_TAG, callback=click_change_bg)
+
+        # Shoot Gun Button
+        dpg.add_button(label="Shoot Gun", tag=SHOOT_TAG, callback=click_shootgun)
 
         # Countdown Timer
         with dpg.group(horizontal=True):
