@@ -6,6 +6,7 @@ import subprocess
 import dearpygui.dearpygui as dpg
 from num2words import num2words
 from pathlib import Path
+from time import sleep
 
 def build_path(path_suffix, file):
     root_path = Path(__file__).parent
@@ -181,7 +182,22 @@ def click_shootgun(sender, app_data, user_data):
     threading.Thread(target=play_shootgun, args=(), daemon=True).start() 
 
 def click_weapon_select(sender, app_data, user_data):                                                       
-    threading.Thread(target=play_sound, args=(weapon_pickup_sound,), daemon=True).start()
+
+    selected_gun = dpg.get_value(GUN_TAG)
+    gun_deploy = build_path("sounds/cs_weapons/deploy", f"{selected_gun}_deploy.wav")
+
+    if selected_gun not in ["deagle", "flashbang"]:                          
+        threading.Thread(target=play_sound, args=(gun_deploy,), daemon=True).start() 
+
+    if selected_gun in ["m4a1", "m4a1_unsil"]:
+        sleep(0.4)
+        m4_boltpull = build_path("sounds/cs_weapons/deploy", "m4a1_boltpull.wav")
+        threading.Thread(target=play_sound, args=(m4_boltpull,), daemon=True).start()
+        return
+
+    if selected_gun in ["deagle", "flashbang"]:
+        threading.Thread(target=play_sound, args=(weapon_pickup_sound,), daemon=True).start()
+        return
 
 def click_change_bg(sender, app_data, user_data):
 
