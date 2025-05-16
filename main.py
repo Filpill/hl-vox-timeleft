@@ -22,9 +22,15 @@ def split_words(hypthenated_word):
     return num2words(hypthenated_word).replace("-", " ").split()
 
 def get_random_file(path):
-        files = [f for f in os.listdir(path)]
-        random_file = random.choice(files) 
-        return f"{path}{random_file}"
+    files = [f for f in os.listdir(path)]
+    random_file = random.choice(files) 
+    return f"{path}{random_file}"
+
+def load_gunnames():
+    gun_path = build_path("sounds/cs_weapons/shoot", "")
+    files = [f.split("-")[0] for f in os.listdir(gun_path)]
+    unique_guns = list(set(files))
+    return sorted(unique_guns)
 
 def time_to_words(time_str):
     hours, minutes, seconds = map(int, time_str.split(":"))
@@ -74,9 +80,15 @@ def play_countdown(dir):
     end_sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
     play_sound(end_sound_path)
 
-def play_shootgun(dir):
-    sound_type = "cs_weapons/shoot"
-    gun_sound_path = get_random_file(build_path(f"sounds/{sound_type}",""))
+def play_shootgun():
+    gun_prefix = dpg.get_value(GUN_TAG)
+    gun_path = build_path("sounds/cs_weapons/shoot", "") 
+
+    gun_filenames = [f for f in os.listdir(gun_path)]
+    gun_filenames_filtered = [gun for gun in gun_filenames if gun_prefix in gun]
+
+    gun_fullpath = [f"{gun_path}{gun}" for gun in gun_filenames_filtered]
+    gun_sound_path = random.choice(gun_fullpath)
     play_sound(gun_sound_path)
 
 #--------------------------------------------------------------------------------#
@@ -166,8 +178,10 @@ def click_timeleft(sender, app_data, user_data):
     threading.Thread(target=play_timeleft, args=(remaining_time, "sounds/vox",), daemon=True).start()
 
 def click_shootgun(sender, app_data, user_data):                                                      
-                                                                                                      
-    threading.Thread(target=play_shootgun, args=("cs_weapons/shoot",), daemon=True).start() 
+    threading.Thread(target=play_shootgun, args=(), daemon=True).start() 
+
+def click_weapon_select(sender, app_data, user_data):                                                       
+    threading.Thread(target=play_sound, args=(weapon_pickup_sound,), daemon=True).start()
 
 def click_change_bg(sender, app_data, user_data):
 
@@ -210,7 +224,7 @@ if __name__ == "__main__":
     screen_width      = 1920
     screen_height     = 1080
     viewport_width    = 250
-    viewport_height   = 375
+    viewport_height   = 405
     image_width       = 250
     image_height      = 180
     padding_input     = 75
@@ -218,6 +232,7 @@ if __name__ == "__main__":
     padding_ywin_pos  = 10
     padding_timeleft  = 15
 
+    GUN_TAG         = "gun_tag"
     TEXT_TAG        = "text_tag"
     TIMER_TAG       = "timer_text"
     INPUT_TAG       = "input_field"
@@ -230,14 +245,15 @@ if __name__ == "__main__":
     TIMELEFT_TAG    = "timeleft_button"
     BACKGROUND_TAG  = "background_button"
 
-    bg_texture_path = get_random_file(build_path("img/bg",""))
-    bg_sound        = build_path("sounds/UI/","buttonclick.wav")
-    start_sound     = build_path("sounds/buttons/","button3.wav")
-    pause_sound     = build_path("sounds/common/","wpn_select.wav")
-    reset_sound     = build_path("sounds/buttons/","button1.wav")
-    timeleft_sound  = build_path("sounds/UI/","buttonclick.wav")
-    open_app_sound  = build_path("sounds/items/","gunpickup2.wav")
-    font_trebuc     = build_path("fonts","trebuc.ttf")
+    bg_texture_path      = get_random_file(build_path("img/bg",""))
+    bg_sound             = build_path("sounds/UI/","buttonclick.wav")
+    start_sound          = build_path("sounds/buttons/","button3.wav")
+    pause_sound          = build_path("sounds/common/","wpn_select.wav")
+    reset_sound          = build_path("sounds/buttons/","button1.wav")
+    timeleft_sound       = build_path("sounds/UI/","buttonclick.wav")
+    weapon_pickup_sound  = build_path("sounds/items/","gunpickup2.wav")
+    open_app_sound       = build_path("sounds/items/","gunpickup2.wav")
+    font_trebuc          = build_path("fonts","trebuc.ttf")
 
     # Sound to play on opening application                                              
     threading.Thread(target=play_sound, args=(open_app_sound,), daemon=True).start() 
@@ -271,13 +287,17 @@ if __name__ == "__main__":
 
     with dpg.window(tag="Timer Window"):
 
-        dpg.add_spacer(height=image_height)
+        dpg.add_spacer(height=image_height-5)
 
         # Change BG button
         dpg.add_button(label="Change Background", tag=BACKGROUND_TAG, callback=click_change_bg)
 
         # Shoot Gun Button
-        dpg.add_button(label="Shoot Gun", tag=SHOOT_TAG, callback=click_shootgun)
+        with dpg.group(horizontal=True):
+            with dpg.group(horizontal=False):
+                dpg.add_text("Select Gun")
+                dpg.add_combo(tag=GUN_TAG, default_value="glock18", items=load_gunnames(), callback=click_weapon_select, width=100)
+            dpg.add_button(label="Fire", tag=SHOOT_TAG, callback=click_shootgun, height=45, width=127)
 
         # Countdown Timer
         with dpg.group(horizontal=True):
@@ -296,7 +316,6 @@ if __name__ == "__main__":
             dpg.add_button(label="Reset Timer", tag=RESET_TAG)
 
         # Timeleft Button
-        dpg.add_spacer(height=1)
         dpg.add_button(label="Timeleft", tag=TIMELEFT_TAG)
 
     
