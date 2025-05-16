@@ -83,14 +83,30 @@ def play_countdown(dir):
 
 def play_shootgun():
     gun_prefix = dpg.get_value(GUN_TAG)
-    gun_path = build_path("sounds/cs_weapons/shoot", "") 
+    gun_path = build_path("sounds/cs_weapons/shoot", "")
 
-    gun_filenames = [f for f in os.listdir(gun_path)]
-    gun_filenames_filtered = [gun for gun in gun_filenames if gun_prefix in gun]
+    # Get all filenames in the gun_path directory
+    gun_filenames = os.listdir(gun_path)
 
-    gun_fullpath = [f"{gun_path}{gun}" for gun in gun_filenames_filtered]
-    gun_sound_path = random.choice(gun_fullpath)
-    play_sound(gun_sound_path)
+    # Determine if we're looking for "unsil" sounds or not
+    is_unsil = "unsil" in gun_prefix
+
+    # Filter the sounds accordingly
+    filtered_sounds = [
+        gun for gun in gun_filenames
+        if gun_prefix in gun and (("unsil" in gun) if is_unsil else ("unsil" not in gun))
+    ]
+
+    # Construct full paths
+    gun_fullpaths = [os.path.join(gun_path, gun) for gun in filtered_sounds]
+
+    if not gun_fullpaths:
+        print("No matching gun sounds found.")
+        return
+
+    # Pick a random sound and play it
+    selected_sound = random.choice(gun_fullpaths)
+    play_sound(selected_sound)
 
 #--------------------------------------------------------------------------------#
 
