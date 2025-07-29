@@ -6,7 +6,7 @@ Python `dearpygui` application to manage your time -- now with Half-Life sky tex
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/img/model/t-squad.png" alt="T Squad" height="220"/>
-  <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/gif/hl-timer1.gif" alt="HL Timer" height="300"/>
+  <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/gif/hl-timer-v2.gif" alt="HL Timer" height="300"/>
   <img src="https://raw.githubusercontent.com/Filpill/hl-vox-timeleft/refs/heads/main/assets/img/model/ct-squad.png" alt="CT Squad" height="220"/>
 </p>                                                                                                                        
 
