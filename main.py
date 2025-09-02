@@ -35,19 +35,19 @@ def load_gunnames():
 
 def time_to_words(time_str):
     hours, minutes, seconds = map(int, time_str.split(":"))
-    
+ 
     words = []
-    
+
     if hours > 0:
         words += split_words(hours)
         words.append("hour" if hours == 1 else "hours")
-    
+
     if minutes > 0:
         if hours > 0:
             words.append("_comma")
         words += split_words(minutes)
         words.append("minutes") # No sound-bite for "singular minute"
-    
+ 
     if seconds > 0:
         if hours > 0 or minutes > 0:
             words.append("and")
@@ -194,15 +194,15 @@ def click_timeleft(sender, app_data, user_data):
     remaining_time = dpg.get_value(TIMER_TAG)
     threading.Thread(target=play_timeleft, args=(remaining_time, "sounds/vox",), daemon=True).start()
 
-def click_shootgun(sender, app_data, user_data):                                                      
+def click_shootgun(sender, app_data, user_data):
     threading.Thread(target=play_shootgun, args=(), daemon=True).start() 
 
-def click_weapon_select(sender, app_data, user_data):                                                       
+def click_weapon_select(sender, app_data, user_data):
 
     selected_gun = dpg.get_value(GUN_TAG)
     gun_deploy = build_path("sounds/cs_weapons/deploy", f"{selected_gun}_deploy.wav")
 
-    if selected_gun not in ["deagle", "flashbang"]:                          
+    if selected_gun not in ["deagle", "flashbang"]:
         threading.Thread(target=play_sound, args=(gun_deploy,), daemon=True).start() 
 
     if selected_gun in ["m4a1", "m4a1_unsil"]:
@@ -219,17 +219,17 @@ def click_change_bg(sender, app_data, user_data):
 
     # Play sound after activating callback
     threading.Thread(target=play_sound, args=(bg_sound,), daemon=True).start()
-    
-    # Get new BG image
-    bg_texture_path = get_random_file(build_path("img/bg",""))  
-    bg_texture_name = bg_texture_path.rsplit('/', 1)[-1]
-    if not os.path.isfile(bg_texture_path):                                       
-        print(f"Image not found: {bg_texture_path}")                              
-        return                                                                    
 
-    # Update existing texture                                 
+    # Get new BG image
+    bg_texture_path = get_random_file(build_path("img/bg",""))
+    bg_texture_name = bg_texture_path.rsplit('/', 1)[-1]
+    if not os.path.isfile(bg_texture_path):
+        print(f"Image not found: {bg_texture_path}")
+        return
+
+    # Update existing texture
     width, height, channels, data = dpg.load_image(bg_texture_path)
-    dpg.set_value(IMAGE_TAG, data)                            
+    dpg.set_value(IMAGE_TAG, data)
     dpg.configure_item(IMAGE_TAG, width=image_width, height=image_height) 
 
     # Clear old drawlist
@@ -297,10 +297,10 @@ if __name__ == "__main__":
     width, height, channels, data = dpg.load_image(bg_texture_path) 
 
     # Adding assets to registry
-    with dpg.font_registry():                                                              
-        large_font = dpg.add_font(font_trebuc, 48)  
+    with dpg.font_registry():
+        large_font = dpg.add_font(font_trebuc, 48)
 
-    with dpg.texture_registry():                                                              
+    with dpg.texture_registry():
         bg = dpg.add_dynamic_texture(width, height, data, tag=IMAGE_TAG)
 
     with dpg.viewport_drawlist(front=True, tag=DRAWLIST_TAG):
@@ -350,7 +350,7 @@ if __name__ == "__main__":
         # Timeleft Button
         dpg.add_button(label="Timeleft", tag=TIMELEFT_TAG)
 
-    
+ 
     # Positioning window upon opening application
     x_pos = screen_width - viewport_width - padding_xwin_pos  
     y_pos = screen_height - viewport_height - padding_ywin_pos
