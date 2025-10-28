@@ -17,7 +17,7 @@ from google.api_core import exceptions
 
 
 def setup_bigquery_clickstream(
-    project_id: str = "checkmate-453316",
+    project_id: str = "experiment-476518",
     dataset_id: str = "hl_timeleft",
     table_id: str = "clickstream",
     location: str = "US"
@@ -56,6 +56,8 @@ def setup_bigquery_clickstream(
                            description="Hashed machine identifier for user tracking"),
         bigquery.SchemaField("session_id", "STRING", mode="REQUIRED",
                            description="UUID identifying the application session"),
+        bigquery.SchemaField("app_version", "STRING", mode="REQUIRED",
+                           description="Application version (SemVer format)"),
         bigquery.SchemaField("timestamp", "TIMESTAMP", mode="REQUIRED",
                            description="Event timestamp (UTC)"),
         bigquery.SchemaField("event_type", "STRING", mode="REQUIRED",
@@ -128,14 +130,14 @@ if __name__ == "__main__":
         print("Usage: python setup_bigquery.py [PROJECT_ID] [DATASET_ID] [TABLE_ID]")
         print()
         print("Defaults:")
-        print("  PROJECT_ID  = checkmate-453316")
+        print("  PROJECT_ID  = experiment-476518")
         print("  DATASET_ID  = hl_timeleft")
         print("  TABLE_ID    = clickstream")
         print()
         sys.exit(0)
 
     # Parse command line arguments
-    project_id = sys.argv[1] if len(sys.argv) > 1 else "checkmate-453316"
+    project_id = sys.argv[1] if len(sys.argv) > 1 else "experiment-476518"
     dataset_id = sys.argv[2] if len(sys.argv) > 2 else "hl_timeleft"
     table_id = sys.argv[3] if len(sys.argv) > 3 else "clickstream"
 

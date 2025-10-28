@@ -53,7 +53,7 @@ class Config:
 
     # BigQuery Clickstream Settings
     CLICKSTREAM_ENABLED = True  # Set to False to disable tracking
-    CLICKSTREAM_PROJECT_ID = "checkmate-453316"
+    CLICKSTREAM_PROJECT_ID = "experiment-476518"
     CLICKSTREAM_DATASET_ID = "hl_timeleft"
     CLICKSTREAM_TABLE_ID = "clickstream"
     CLICKSTREAM_BATCH_SIZE = 10  # Number of events to batch before inserting

@@ -13,6 +13,7 @@ from google.cloud import bigquery
 from google.api_core import exceptions
 
 from libs.machine_id import get_machine_id
+from libs.version import __version__
 
 
 class ClickstreamTracker:
@@ -28,7 +29,7 @@ class ClickstreamTracker:
 
     def __init__(
         self,
-        project_id: str = "checkmate-453316",
+        project_id: str = "experiment-476518",
         dataset_id: str = "hl_timeleft",
         table_id: str = "clickstream",
         batch_size: int = 10,
@@ -55,6 +56,9 @@ class ClickstreamTracker:
 
         # Generate unique session ID for this application instance
         self.session_id = str(uuid.uuid4())
+
+        # Get application version
+        self.app_version = __version__
 
         # Event queue for async processing
         self.event_queue = queue.Queue()
@@ -105,6 +109,7 @@ class ClickstreamTracker:
         event = {
             "user_id": self.user_id,
             "session_id": self.session_id,
+            "app_version": self.app_version,
             "timestamp": datetime.utcnow().isoformat(),
             "event_type": event_type,
             "component": component,

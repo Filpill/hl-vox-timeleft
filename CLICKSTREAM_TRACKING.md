@@ -58,7 +58,7 @@ python setup_bigquery.py
 ```
 
 This creates:
-- **Dataset**: `checkmate-453316.hl_timeleft`
+- **Dataset**: `experiment-476518.hl_timeleft`
 - **Table**: `clickstream`
 - **Partitioning**: Daily partitions by timestamp
 - **Clustering**: By session_id, event_type, component
@@ -82,7 +82,7 @@ Edit `libs/config.py`:
 CLICKSTREAM_ENABLED = True  # Set to False to disable
 
 # BigQuery settings
-CLICKSTREAM_PROJECT_ID = "checkmate-453316"
+CLICKSTREAM_PROJECT_ID = "experiment-476518"
 CLICKSTREAM_DATASET_ID = "hl_timeleft"
 CLICKSTREAM_TABLE_ID = "clickstream"
 CLICKSTREAM_BATCH_SIZE = 10  # Events per batch
@@ -152,7 +152,7 @@ When the application exits:
 SELECT
     component,
     COUNT(*) as click_count
-FROM `checkmate-453316.hl_timeleft.clickstream`
+FROM `experiment-476518.hl_timeleft.clickstream`
 WHERE event_type = 'button_click'
 GROUP BY component
 ORDER BY click_count DESC;
@@ -166,7 +166,7 @@ SELECT
     MAX(timestamp) as session_end,
     TIMESTAMP_DIFF(MAX(timestamp), MIN(timestamp), SECOND) as session_duration_sec,
     COUNT(*) as total_events
-FROM `checkmate-453316.hl_timeleft.clickstream`
+FROM `experiment-476518.hl_timeleft.clickstream`
 GROUP BY session_id
 ORDER BY session_start DESC;
 ```
@@ -176,7 +176,7 @@ ORDER BY session_start DESC;
 SELECT
     JSON_EXTRACT_SCALAR(metadata, '$.weapon') as weapon,
     COUNT(*) as usage_count
-FROM `checkmate-453316.hl_timeleft.clickstream`
+FROM `experiment-476518.hl_timeleft.clickstream`
 WHERE component IN ('shoot_gun_button', 'weapon_dropdown')
     AND metadata IS NOT NULL
 GROUP BY weapon
@@ -188,7 +188,7 @@ ORDER BY usage_count DESC;
 SELECT
     EXTRACT(HOUR FROM timestamp) as hour,
     COUNT(*) as event_count
-FROM `checkmate-453316.hl_timeleft.clickstream`
+FROM `experiment-476518.hl_timeleft.clickstream`
 WHERE DATE(timestamp) = CURRENT_DATE()
 GROUP BY hour
 ORDER BY hour;
@@ -245,7 +245,7 @@ print(f"Queue: {stats['queue_size']}, Buffer: {stats['buffer_size']}")
 ### Table Not Found Error
 
 ```
-Error: BigQuery table checkmate-453316.hl_timeleft.clickstream not found
+Error: BigQuery table experiment-476518.hl_timeleft.clickstream not found
 ```
 
 **Solution**: Run setup script
@@ -284,7 +284,7 @@ export HL_VOX_CLICKSTREAM_ENABLED=false
 **Data Retention**: Configure BigQuery table expiration if needed:
 ```bash
 bq update --time_partitioning_expiration 2592000 \
-    checkmate-453316:hl_timeleft.clickstream
+    experiment-476518:hl_timeleft.clickstream
 ```
 (30 days = 2592000 seconds)
 
@@ -315,7 +315,7 @@ Example export:
 ```bash
 bq extract \
     --destination_format=CSV \
-    checkmate-453316:hl_timeleft.clickstream \
+    experiment-476518:hl_timeleft.clickstream \
     gs://my-bucket/clickstream-*.csv
 ```
 
@@ -330,7 +330,7 @@ bq extract \
 
 ```sql
 SELECT *
-FROM `checkmate-453316.hl_timeleft.clickstream`
+FROM `experiment-476518.hl_timeleft.clickstream`
 ORDER BY timestamp DESC
 LIMIT 20;
 ```
@@ -339,7 +339,7 @@ LIMIT 20;
 
 ```sql
 SELECT DISTINCT session_id, COUNT(*) as events
-FROM `checkmate-453316.hl_timeleft.clickstream`
+FROM `experiment-476518.hl_timeleft.clickstream`
 GROUP BY session_id
 ORDER BY MAX(timestamp) DESC;
 ```
