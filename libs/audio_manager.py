@@ -5,11 +5,11 @@ Handles all audio playback operations and sound sequences.
 
 import os
 import random
-import subprocess
 import threading
 from time import sleep
 from typing import Optional
 from num2words import num2words
+import pygame
 
 from libs.asset_manager import AssetManager
 from libs.config import Config
@@ -27,6 +27,9 @@ class AudioManager:
         """
         self.asset_manager = asset_manager
 
+        # Initialize pygame mixer
+        pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+
         # Preload common sound paths
         self.bg_sound = asset_manager.get_sound_path("UI", "buttonclick.wav")
         self.start_sound = asset_manager.get_sound_path("buttons", "button3.wav")
@@ -38,28 +41,32 @@ class AudioManager:
 
     def play_sound(self, sound_path: str):
         """
-        Play a sound file using ffplay.
+        Play a sound file synchronously using pygame.
 
         Args:
             sound_path: Full path to the sound file
         """
-        subprocess.run(
-            ["bash", "-c", f"ffplay -nodisp -autoexit {sound_path}"],
-            capture_output=True
-        )
+        try:
+            sound = pygame.mixer.Sound(sound_path)
+            channel = sound.play()
+            # Wait for sound to finish
+            while channel.get_busy():
+                pygame.time.wait(10)
+        except pygame.error as e:
+            print(f"Error playing sound {sound_path}: {e}")
 
     def play_sound_async(self, sound_path: str):
         """
-        Play a sound file asynchronously in a separate thread.
+        Play a sound file asynchronously.
 
         Args:
             sound_path: Full path to the sound file
         """
-        threading.Thread(
-            target=self.play_sound,
-            args=(sound_path,),
-            daemon=True
-        ).start()
+        try:
+            sound = pygame.mixer.Sound(sound_path)
+            sound.play()
+        except pygame.error as e:
+            print(f"Error playing sound {sound_path}: {e}")
 
     def time_to_words(self, time_str: str) -> list:
         """
@@ -223,16 +230,27 @@ class AudioManager:
             "sounds/cs_weapons/deploy",
             f"{selected_gun}_deploy.wav"
         )
-        self.play_sound_async(gun_deploy)
 
-        # Special handling for M4A1 bolt pull
+        # Special handling for M4A1 bolt pull (play sequentially)
         if selected_gun in Config.WEAPONS_BOLTPULL:
-            sleep(Config.BOLTPULL_DELAY)
-            m4_boltpull = self.asset_manager.build_path(
-                "sounds/cs_weapons/deploy",
-                "m4a1_boltpull.wav"
-            )
-            self.play_sound_async(m4_boltpull)
+            try:
+                # Play deploy sound and wait
+                deploy_sound = pygame.mixer.Sound(gun_deploy)
+                deploy_sound.play()
+                sleep(Config.BOLTPULL_DELAY)
+
+                # Play bolt pull
+                m4_boltpull = self.asset_manager.build_path(
+                    "sounds/cs_weapons/deploy",
+                    "m4a1_boltpull.wav"
+                )
+                boltpull_sound = pygame.mixer.Sound(m4_boltpull)
+                boltpull_sound.play()
+            except pygame.error as e:
+                print(f"Error playing weapon deploy: {e}")
+        else:
+            # Just play deploy sound async
+            self.play_sound_async(gun_deploy)
 
     def play_weapon_deploy_async(self, selected_gun: str):
         """

@@ -8,17 +8,7 @@ HL-VOX-TimeLEFT is a Half-Life themed Pomodoro timer built with Python and DearP
 
 ## System Requirements
 
-**ffmpeg** must be installed for audio playback via `ffplay`:
-```bash
-# Arch Linux
-sudo pacman -S ffmpeg
-
-# Ubuntu/Debian
-sudo apt install ffmpeg
-
-# macOS
-brew install ffmpeg
-```
+No system dependencies required! Audio playback is handled by the **pygame** library.
 
 ## Environment Setup
 
@@ -91,11 +81,13 @@ main.py
 - Handles pause/resume/reset
 
 **AudioManager** - All audio playback
-- Synchronous and asynchronous playback via `ffplay`
+- Uses pygame.mixer for cross-platform audio playback
+- Synchronous and asynchronous playback modes
 - Sound sequences: countdown (5-4-3-2-1), time-left announcements, weapon sounds
 - Converts time to VOX words using `num2words` library
 - Special weapon handling (M4A1 boltpull, deploy sounds)
 - Preloads common sound paths on initialization
+- Initializes pygame.mixer with optimized settings for low latency
 
 **UIManager** - DearPyGUI interface
 - Creates all GUI elements (buttons, timer display, weapon selector)
@@ -170,8 +162,9 @@ assets/
 ## Threading Model
 
 - **Main Thread**: DearPyGUI event loop
-- **Daemon Threads**: Audio playback, timer countdown
-- All audio plays asynchronously via `*_async()` methods
+- **Daemon Threads**: Timer countdown, sequential audio sequences
+- Simple async audio handled by pygame.mixer (non-blocking)
+- Sequential sounds (VOX announcements, countdown) run in daemon threads
 - Timer update callback runs on timer thread, updates GUI via DearPyGUI (thread-safe)
 
 ## Modifying Components

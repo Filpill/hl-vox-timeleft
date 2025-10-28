@@ -26,12 +26,8 @@ Types of files stored in this project
 </div>
 
 ### System Requirements
-Sub-shell responsible for playing sounds effects and requires `ffmpeg` to be installed on users machine in run Python application:
 
-***e.g. Arch install:***
-```bash
-sudo pacman -S ffmpeg
-```
+No system dependencies required! Audio playback is handled by the **pygame** Python library.
 
 ### Python Virtual Environment
 

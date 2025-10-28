@@ -95,7 +95,7 @@ hl-vox-timeleft/
 
 **Key Methods**:
 - `play_sound(sound_path)` - Play sound synchronously
-- `play_sound_async(sound_path)` - Play sound in background thread
+- `play_sound_async(sound_path)` - Play sound asynchronously (non-blocking)
 - `time_to_words(time_str)` - Convert time to VOX word list
 - `play_timeleft(timeleft)` - Play time announcement
 - `play_countdown()` - Play countdown sequence (5,4,3,2,1)
@@ -103,6 +103,7 @@ hl-vox-timeleft/
 - `play_weapon_deploy(selected_gun)` - Play weapon equip sounds
 
 **Benefits**:
+- Uses pygame.mixer for cross-platform audio (no system dependencies!)
 - Centralized audio management
 - Thread-safe audio playback
 - Reusable sound sequences
