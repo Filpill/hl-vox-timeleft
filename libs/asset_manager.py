@@ -59,15 +59,31 @@ class AssetManager:
         unique_guns = list(set(files))
         return sorted(unique_guns)
 
-    def get_background_texture_path(self) -> str:
+    def get_background_names(self) -> list:
         """
-        Get a random background texture path.
+        Get all background texture filenames.
 
         Returns:
-            Full path to a random background image
+            Sorted list of background image filenames
         """
         bg_path = self.build_path("img/bg")
-        return self.get_random_file(bg_path)
+        files = sorted([f for f in os.listdir(bg_path)])
+        return files
+
+    def get_background_texture_path(self, filename: str = None) -> str:
+        """
+        Get a background texture path. If filename is None, returns random.
+
+        Args:
+            filename: Specific background filename (optional)
+
+        Returns:
+            Full path to a background image
+        """
+        bg_path = self.build_path("img/bg")
+        if filename is None:
+            return self.get_random_file(bg_path)
+        return f"{bg_path}{filename}"
 
     def get_sound_path(self, category: str, filename: str) -> str:
         """

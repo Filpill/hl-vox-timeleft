@@ -8,6 +8,7 @@ from libs.asset_manager import AssetManager
 from libs.timer import Timer
 from libs.audio_manager import AudioManager
 from libs.ui_manager import UIManager
+from libs.clickstream_tracker import ClickstreamTracker
 from libs.application import Application
 
 __all__ = [
@@ -16,5 +17,6 @@ __all__ = [
     'Timer',
     'AudioManager',
     'UIManager',
+    'ClickstreamTracker',
     'Application',
 ]

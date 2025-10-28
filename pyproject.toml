@@ -8,4 +8,5 @@ dependencies = [
     "dearpygui>=2.0.0",
     "num2words>=0.5.14",
     "pygame>=2.5.0",
+    "google-cloud-bigquery>=3.0.0",
 ]

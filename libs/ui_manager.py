@@ -11,6 +11,7 @@ from libs.config import Config
 from libs.asset_manager import AssetManager
 from libs.timer import Timer
 from libs.audio_manager import AudioManager
+from libs.clickstream_tracker import ClickstreamTracker
 
 
 class UIManager:
@@ -20,7 +21,8 @@ class UIManager:
         self,
         asset_manager: AssetManager,
         audio_manager: AudioManager,
-        timer: Timer
+        timer: Timer,
+        clickstream_tracker: ClickstreamTracker
     ):
         """
         Initialize the UI manager.
@@ -29,10 +31,12 @@ class UIManager:
             asset_manager: AssetManager instance
             audio_manager: AudioManager instance
             timer: Timer instance
+            clickstream_tracker: ClickstreamTracker instance
         """
         self.asset_manager = asset_manager
         self.audio_manager = audio_manager
         self.timer = timer
+        self.clickstream_tracker = clickstream_tracker
 
         # UI state
         self.bg_texture_path = None
@@ -89,12 +93,17 @@ class UIManager:
             # Spacer for background image
             dpg.add_spacer(height=Config.IMAGE_HEIGHT - 5)
 
-            # Change background button
-            dpg.add_button(
-                label="Change Background",
-                tag=Config.BACKGROUND_TAG,
-                callback=self._callback_change_bg
-            )
+            # Background selection group
+            with dpg.group(horizontal=False):
+                dpg.add_text("Select Background")
+                bg_options = ["Random"] + self.asset_manager.get_background_names()
+                dpg.add_combo(
+                    tag=Config.BACKGROUND_TAG,
+                    default_value="Random",
+                    items=bg_options,
+                    callback=self._callback_change_bg,
+                    width=Config.VIEWPORT_WIDTH - Config.PADDING_TIMELEFT
+                )
 
             # Weapon selection group
             with dpg.group(horizontal=True):
@@ -159,16 +168,11 @@ class UIManager:
         dpg.set_item_callback(Config.PAUSE_TAG, self._callback_pause)
         dpg.set_item_callback(Config.RESET_TAG, self._callback_reset)
         dpg.set_item_callback(Config.TIMELEFT_TAG, self._callback_timeleft)
-        dpg.set_item_callback(Config.BACKGROUND_TAG, self._callback_change_bg)
 
     def _finalize_setup(self):
         """Finalize GUI setup with styling and configuration."""
         dpg.setup_dearpygui()
         dpg.bind_item_font(Config.TIMER_TAG, self.large_font)
-        dpg.configure_item(
-            Config.BACKGROUND_TAG,
-            width=Config.VIEWPORT_WIDTH - Config.PADDING_TIMELEFT
-        )
         dpg.configure_item(
             Config.TIMELEFT_TAG,
             width=Config.VIEWPORT_WIDTH - Config.PADDING_TIMELEFT
@@ -182,14 +186,19 @@ class UIManager:
     # Callback methods
     def _callback_start(self, sender, app_data, user_data):
         """Callback for start button."""
+        # Track click
+        input_value = dpg.get_value(Config.INPUT_TAG)
+        self.clickstream_tracker.track_event(
+            "button_click",
+            "start_button",
+            {"time_input": input_value}
+        )
+
         # Play sound
         self.audio_manager.play_sound_async(self.audio_manager.start_sound)
 
         # Reset pause button label
         dpg.set_item_label(Config.PAUSE_TAG, "Pause")
-
-        # Get input value
-        input_value = dpg.get_value(Config.INPUT_TAG)
 
         # Start timer
         if not self.timer.start(input_value):
@@ -197,6 +206,13 @@ class UIManager:
 
     def _callback_pause(self, sender, app_data, user_data):
         """Callback for pause button."""
+        # Track click
+        self.clickstream_tracker.track_event(
+            "button_click",
+            "pause_button",
+            {"is_paused": not self.timer.is_paused}
+        )
+
         # Play sound
         self.audio_manager.play_sound_async(self.audio_manager.pause_sound)
 
@@ -209,6 +225,9 @@ class UIManager:
 
     def _callback_reset(self, sender, app_data, user_data):
         """Callback for reset button."""
+        # Track click
+        self.clickstream_tracker.track_event("button_click", "reset_button")
+
         # Play sound
         self.audio_manager.play_sound_async(self.audio_manager.reset_sound)
 
@@ -218,30 +237,68 @@ class UIManager:
 
     def _callback_timeleft(self, sender, app_data, user_data):
         """Callback for time-left button."""
+        # Get remaining time
+        remaining_time = dpg.get_value(Config.TIMER_TAG)
+
+        # Track click
+        self.clickstream_tracker.track_event(
+            "button_click",
+            "timeleft_button",
+            {"remaining_time": remaining_time}
+        )
+
         # Play sound
         self.audio_manager.play_sound_async(self.audio_manager.timeleft_sound)
 
-        # Get remaining time and play announcement
-        remaining_time = dpg.get_value(Config.TIMER_TAG)
+        # Play announcement
         self.audio_manager.play_timeleft_async(remaining_time)
 
     def _callback_shootgun(self, sender, app_data, user_data):
         """Callback for shoot gun button."""
         gun_prefix = dpg.get_value(Config.GUN_TAG)
+
+        # Track click
+        self.clickstream_tracker.track_event(
+            "button_click",
+            "shoot_gun_button",
+            {"weapon": gun_prefix}
+        )
+
         self.audio_manager.play_shootgun_async(gun_prefix)
 
     def _callback_weapon_select(self, sender, app_data, user_data):
         """Callback for weapon selection."""
         selected_gun = dpg.get_value(Config.GUN_TAG)
+
+        # Track selection
+        self.clickstream_tracker.track_event(
+            "weapon_select",
+            "weapon_dropdown",
+            {"weapon": selected_gun}
+        )
+
         self.audio_manager.play_weapon_deploy_async(selected_gun)
 
     def _callback_change_bg(self, sender, app_data, user_data):
-        """Callback for change background button."""
+        """Callback for background selection dropdown."""
+        selected_bg = dpg.get_value(Config.BACKGROUND_TAG)
+
+        # Track selection
+        self.clickstream_tracker.track_event(
+            "background_select",
+            "background_dropdown",
+            {"background": selected_bg}
+        )
+
         # Play sound
         self.audio_manager.play_sound_async(self.audio_manager.bg_sound)
 
-        # Get new background texture
-        bg_texture_path = self.asset_manager.get_background_texture_path()
+        # Get background texture path based on selection
+        if selected_bg == "Random":
+            bg_texture_path = self.asset_manager.get_background_texture_path()
+        else:
+            bg_texture_path = self.asset_manager.get_background_texture_path(selected_bg)
+
         bg_texture_name = bg_texture_path.rsplit('/', 1)[-1]
 
         if not os.path.isfile(bg_texture_path):

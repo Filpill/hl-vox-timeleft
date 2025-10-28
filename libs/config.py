@@ -40,7 +40,7 @@ class Config:
     SHOOT_TAG = "shoot_gun_button"
     DRAWLIST_TAG = "drawlist_tag"
     TIMELEFT_TAG = "timeleft_button"
-    BACKGROUND_TAG = "background_button"
+    BACKGROUND_TAG = "background_combo"
 
     # Sound types
     COUNTDOWN_SOUNDS = ["five", "four", "three", "two", "one"]
@@ -50,3 +50,10 @@ class Config:
     WEAPONS_NO_DEPLOY = ["deagle", "flashbang"]
     WEAPONS_BOLTPULL = ["m4a1", "m4a1_unsil"]
     BOLTPULL_DELAY = 0.4  # seconds
+
+    # BigQuery Clickstream Settings
+    CLICKSTREAM_ENABLED = True  # Set to False to disable tracking
+    CLICKSTREAM_PROJECT_ID = "checkmate-453316"
+    CLICKSTREAM_DATASET_ID = "hl_timeleft"
+    CLICKSTREAM_TABLE_ID = "clickstream"
+    CLICKSTREAM_BATCH_SIZE = 10  # Number of events to batch before inserting
